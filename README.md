@@ -2,7 +2,7 @@
 
 **Look up any IP. See where it is — and whether to trust it.**
 
-🔴 **Live tool:** https://sougatshekhar97-cpu.github.io/ipscope/
+🔴 **Live tool:** https://sougatshekharhota.github.io/ipscope/
 
 IPSCOPE is a zero-backend web app that takes any IPv4/IPv6 address and returns:
 
@@ -14,8 +14,8 @@ IPSCOPE is a zero-backend web app that takes any IPv4/IPv6 address and returns:
 
 > **Why this project is mine:** the risk score uses the same **weighted-signal scoring model**
 > that runs through my other work — account health at Bharti Airtel,
-> [PULSE-360](https://github.com/sougatshekhar97-cpu/pulse-360) for marketing channels, and
-> [OPTICHAIN](https://github.com/sougatshekhar97-cpu/optichain) for suppliers. One methodology,
+> [PULSE-360](https://github.com/sougatshekharhota/pulse-360) for marketing channels, and
+> [OPTICHAIN](https://github.com/sougatshekharhota/optichain) for suppliers. One methodology,
 > now pointed at network reputation.
 
 ## Design notes
@@ -62,6 +62,6 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-**Sougat Shekhar Hota** · [Portfolio](https://sougatshekhar97-cpu.github.io/portfolio/) ·
-[PULSE-360](https://github.com/sougatshekhar97-cpu/pulse-360) ·
-[OPTICHAIN](https://github.com/sougatshekhar97-cpu/optichain)
+**Sougat Shekhar Hota** · [Portfolio](https://sougatshekharhota.github.io/portfolio/) ·
+[PULSE-360](https://github.com/sougatshekharhota/pulse-360) ·
+[OPTICHAIN](https://github.com/sougatshekharhota/optichain)
