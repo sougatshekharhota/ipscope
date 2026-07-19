@@ -137,10 +137,54 @@
   footer a{color:var(--accent); text-decoration:none}
   footer .disc{max-width:60ch; font-style:italic; font-family:var(--serif); font-size:13.5px}
 
+  /* mode toggle */
+  .modebar{display:flex; gap:10px; flex-wrap:wrap; margin:26px 0 2px}
+  .modebar button{cursor:pointer; background:var(--card); border:1px solid var(--line); border-radius:999px;
+    padding:11px 20px; font:600 12px/1 var(--sans); text-transform:uppercase; letter-spacing:.07em; color:var(--mut);
+    transition:background .3s, color .3s, border-color .3s}
+  .modebar button:hover{border-color:var(--ink); color:var(--ink)}
+  .modebar button.on{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .mode{display:none} .mode.on{display:block; animation:rise .4s ease both}
+
+  /* scanner form */
+  .fwform{display:grid; grid-template-columns:1.25fr 1fr auto; gap:10px; margin:34px 0 14px}
+  .fwform select, .fwform input{padding:15px 16px; border:1px solid var(--line); border-radius:12px; background:var(--card);
+    color:var(--ink); font:400 16px/1 var(--sans); outline:none; transition:border-color .3s, box-shadow .3s; width:100%}
+  .fwform select:focus, .fwform input:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(34,81,255,.12)}
+
+  /* severity stat row */
+  .stats{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:4px}
+  .stat{border:1px solid var(--line); border-radius:12px; padding:15px 12px; text-align:center; background:var(--bg)}
+  .stat .n{font:400 32px/1 var(--serif)}
+  .stat .l{font:600 10px/1.2 var(--sans); text-transform:uppercase; letter-spacing:.07em; color:var(--mut); margin-top:7px}
+  .stat.crit .n{color:var(--bad)}
+  .stat.kev{background:var(--bad-bg); border-color:rgba(192,54,44,.3)} .stat.kev .n{color:var(--bad)}
+
+  /* recommended-fix callout */
+  .fix{margin:20px 0 4px; padding:18px 22px; border-radius:14px; border:1px solid var(--line); background:var(--panel);
+    font-size:15px; line-height:1.5; display:flex; gap:12px; align-items:baseline}
+
+  /* cve table */
+  .tablewrap{overflow-x:auto; margin-top:6px}
+  .cvetable{width:100%; border-collapse:collapse; font-size:13.5px; min-width:640px}
+  .cvetable th{text-align:left; font:600 11px/1 var(--sans); text-transform:uppercase; letter-spacing:.06em;
+    color:var(--mut); padding:10px; border-bottom:1px solid var(--line)}
+  .cvetable td{padding:12px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+  .cvetable tr:last-child td{border-bottom:0}
+  .cvetable td a{color:var(--accent); text-decoration:none; font-weight:600; white-space:nowrap}
+  .cvetable .desc{color:var(--mut); font-size:12.5px; line-height:1.5; min-width:240px}
+  .sev-badge{display:inline-block; padding:3px 9px; border-radius:999px; font:600 11px/1 var(--sans); white-space:nowrap}
+  .sev-CRITICAL{background:var(--bad-bg); color:var(--bad)} .sev-HIGH{background:var(--warn-bg); color:var(--warn)}
+  .sev-MEDIUM{background:var(--info-bg); color:var(--info)} .sev-LOW,.sev-{background:var(--panel); color:var(--mut)}
+  .kev-badge{display:inline-block; margin-left:6px; padding:3px 8px; border-radius:999px; background:var(--bad);
+    color:#fff; font:600 10px/1 var(--sans); text-transform:uppercase; letter-spacing:.04em; vertical-align:middle}
+
   @media (max-width:760px){
     .grid, .signals{grid-template-columns:1fr}
     .head-links a.hide-sm{display:none}
     .verdict{padding:22px}
+    .fwform{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
@@ -157,6 +201,12 @@
 </header>
 
 <main class="wrap" id="top">
+  <div class="modebar">
+    <button id="m-ip" class="on">◎ IP Threat Lookup</button>
+    <button id="m-fw">🛡 Firewall Patch-Gap Scanner</button>
+  </div>
+
+  <div class="mode on" id="mode-ip">
   <section class="hero">
     <div class="eyebrow caps">IP Threat &amp; Geolocation Intelligence</div>
     <h1>Look up any IP. See where it is — and whether to trust it.</h1>
@@ -231,6 +281,74 @@
       </div>
     </details>
   </section>
+  </div><!-- /mode-ip -->
+
+  <div class="mode" id="mode-fw">
+  <section class="hero">
+    <div class="eyebrow caps">Firewall Exposure &amp; Patch-Gap Scanner</div>
+    <h1>Is your firewall running a version with known holes?</h1>
+    <p class="lede">Pick your firewall platform and enter the firmware version you're running. IPSCOPE checks it
+      against every published vulnerability for that product — cross-referenced with CISA's actively-exploited
+      catalog — and tells you whether to patch, and to which version.</p>
+
+    <form class="fwform" id="fw-form" autocomplete="off">
+      <select id="fw-product" aria-label="Firewall product"><option>Loading products…</option></select>
+      <input id="fw-version" type="text" placeholder="Your version — e.g. 7.2.4" aria-label="Version">
+      <button class="btn primary" type="submit" id="fw-go">Check</button>
+    </form>
+    <div class="examples">
+      <span>Try:</span>
+      <button data-p="fortinet-fortios" data-v="7.0.5">FortiOS 7.0.5</button>
+      <button data-p="paloalto-panos" data-v="10.2.3">PAN-OS 10.2.3</button>
+      <button data-p="cisco-asa" data-v="9.16.1">Cisco ASA 9.16.1</button>
+    </div>
+    <div class="err" id="fw-err"></div>
+    <div id="fw-loading"><span class="spin"></span> Loading vulnerability index…</div>
+  </section>
+
+  <section id="fw-results">
+    <div class="verdict" id="fw-verdict">
+      <div class="vtext">
+        <span class="vip" id="fw-target"></span>
+        <h2 id="fw-title"></h2>
+        <span class="vsum" id="fw-sum"></span>
+      </div>
+      <div class="gauge">
+        <div><span class="num" id="fw-count"></span></div>
+        <div class="lbl">Known CVEs</div>
+      </div>
+    </div>
+
+    <div id="fw-fix" class="fix" style="display:none"></div>
+
+    <div class="card" style="margin-top:20px">
+      <span class="caps">Severity of matching vulnerabilities</span>
+      <h3 style="margin-bottom:14px">Exposure breakdown</h3>
+      <div class="stats" id="fw-stats"></div>
+    </div>
+
+    <div class="card" id="fw-list-card" style="margin-top:20px">
+      <span class="caps">Matching vulnerabilities</span>
+      <h3 id="fw-list-title" style="margin-bottom:6px">CVEs affecting your version</h3>
+      <div class="tablewrap"><table class="cvetable" id="fw-table"></table></div>
+    </div>
+
+    <details class="method">
+      <summary>How the patch-gap check works</summary>
+      <div class="m-body">
+        <p>Your version is tested against the affected-version ranges of every published CVE for the selected
+        product. Data comes from the <a href="https://nvd.nist.gov/developers/vulnerabilities" target="_blank" rel="noopener" style="color:var(--accent)">NVD 2.0 API</a>
+        and is cross-referenced with the <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener" style="color:var(--accent)">CISA Known Exploited Vulnerabilities</a>
+        catalog to flag CVEs under active attack. A CVE counts as affecting you when your version falls inside any of
+        its vulnerable ranges (e.g. ≥ 7.0.0 and &lt; 7.0.12). The recommended version clears every matched range —
+        the same transparent, weighted approach behind
+        <a href="https://github.com/sougatshekharhota/pulse-360" target="_blank" rel="noopener" style="color:var(--accent)">PULSE-360</a> and
+        <a href="https://github.com/sougatshekharhota/optichain" target="_blank" rel="noopener" style="color:var(--accent)">OPTICHAIN</a>.</p>
+        <p id="fw-meta" style="margin-top:10px"></p>
+      </div>
+    </details>
+  </section>
+  </div><!-- /mode-fw -->
 </main>
 
 <footer>
@@ -412,8 +530,164 @@ function fail(msg){
 /* ---- events ---- */
 $('#form').addEventListener('submit', e => { e.preventDefault(); lookup($('#ip').value.trim()); });
 $('#mine').addEventListener('click', () => { $('#ip').value = ''; lookup(''); });
-document.querySelectorAll('.examples button').forEach(b =>
+document.querySelectorAll('#mode-ip .examples button').forEach(b =>
   b.addEventListener('click', () => { $('#ip').value = b.dataset.ex; lookup(b.dataset.ex); }));
+</script>
+
+<script>
+/* ===== Firewall Patch-Gap Scanner ===== */
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const NVD_CVE = 'https://nvd.nist.gov/vuln/detail/';
+let INDEX = null, loading = null;
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function loadIndex(){
+  if(INDEX) return Promise.resolve(INDEX);
+  if(loading) return loading;
+  loading = fetch('cve-index.json')
+    .then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d => { INDEX = d; return d; });
+  return loading;
+}
+
+/* tolerant version comparison: split into numeric/alpha tokens, compare pairwise */
+function vtokens(v){ return (String(v).toLowerCase().match(/\d+|[a-z]+/g) || []).map(t => /^\d+$/.test(t) ? {n:+t} : {s:t}); }
+function vcmp(a, b){
+  const A = vtokens(a), B = vtokens(b), L = Math.max(A.length, B.length);
+  for(let i=0; i<L; i++){
+    const x = A[i], y = B[i];
+    if(x === undefined) return -1;
+    if(y === undefined) return 1;
+    if('n' in x && 'n' in y){ if(x.n !== y.n) return x.n < y.n ? -1 : 1; }
+    else if('s' in x && 's' in y){ if(x.s !== y.s) return x.s < y.s ? -1 : 1; }
+    else return ('n' in x) ? 1 : -1;   // a released number outranks a suffix (beta/mr)
+  }
+  return 0;
+}
+function inRange(v, r){
+  if('eq' in r) return vcmp(v, r.eq) === 0;
+  let ok = true;
+  if('gte' in r) ok = ok && vcmp(v, r.gte) >= 0;
+  if('gt'  in r) ok = ok && vcmp(v, r.gt)  >  0;
+  if('lte' in r) ok = ok && vcmp(v, r.lte) <= 0;
+  if('lt'  in r) ok = ok && vcmp(v, r.lt)  <  0;
+  return ok;
+}
+function matchedRange(rec, v){ return rec.r.find(r => inRange(v, r)); }
+function fixOf(r){ if(r.lt) return '≥ ' + r.lt; if(r.lte) return '> ' + r.lte; return null; }
+function recommend(hits){
+  let best = null;
+  hits.forEach(h => { const c = h.mr.lt; if(c && (!best || vcmp(c, best) > 0)) best = c; });
+  return best;
+}
+
+function populateProducts(d){
+  $('#fw-product').innerHTML = d.products.map(p =>
+    `<option value="${p.key}">${esc(p.vendor + ' — ' + p.product)} (${p.count} CVEs)</option>`).join('');
+}
+function fwFail(m){ const e = $('#fw-err'); e.textContent = m; e.classList.add('on');
+  $('#fw-loading').classList.remove('on'); $('#fw-go').disabled = false; }
+
+function check(pkey, version){
+  $('#fw-err').classList.remove('on');
+  version = (version || '').trim();
+  if(!version) return fwFail('Enter the firmware / software version you are running (e.g. 7.2.4).');
+  $('#fw-loading').classList.add('on'); $('#fw-go').disabled = true;
+  loadIndex().then(d => {
+    $('#fw-loading').classList.remove('on'); $('#fw-go').disabled = false;
+    const prod = d.products.find(p => p.key === pkey) || d.products[0];
+    const recs = d.cves[prod.key] || [];
+    const hits = [];
+    recs.forEach(rec => { const mr = matchedRange(rec, version); if(mr) hits.push({rec, mr}); });
+    render(prod, version, hits);
+  }).catch(e => fwFail('Could not load the vulnerability index — ' + e.message + '.'));
+}
+
+function render(prod, version, hits){
+  const n = hits.length;
+  const kev = hits.filter(h => h.rec.kev).length;
+  const counts = {CRITICAL:0, HIGH:0, MEDIUM:0, LOW:0, '':0};
+  hits.forEach(h => { const s = counts.hasOwnProperty(h.rec.sev) ? h.rec.sev : ''; counts[s]++; });
+  const crit = counts.CRITICAL;
+
+  $('#fw-target').textContent = prod.vendor + ' ' + prod.product + ' · v' + version;
+  $('#fw-count').textContent = n;
+
+  const v = $('#fw-verdict');
+  if(n === 0){
+    v.className = 'verdict v-good';
+    $('#fw-title').textContent = 'Up to date';
+    $('#fw-sum').textContent = 'No known vulnerabilities are recorded for this version in the NVD. Nothing to patch based on public CVE data.';
+    $('#fw-fix').style.display = 'none';
+  } else {
+    const cls = (kev > 0 || crit > 0) ? 'v-bad' : (counts.HIGH > 0 ? 'v-warn' : 'v-info');
+    v.className = 'verdict ' + cls;
+    $('#fw-title').textContent = (kev > 0 || crit > 0) ? 'Update urgently' : 'Update recommended';
+    const bits = [];
+    if(crit) bits.push(crit + ' critical');
+    if(kev)  bits.push(kev + ' actively exploited (CISA KEV)');
+    $('#fw-sum').textContent = `${n} known ${n === 1 ? 'vulnerability affects' : 'vulnerabilities affect'} this version`
+      + (bits.length ? ` — ${bits.join(', ')}.` : '.');
+    const rec = recommend(hits);
+    if(rec){
+      $('#fw-fix').style.display = 'flex';
+      $('#fw-fix').innerHTML = `🛠 <span><b>Recommended action:</b> upgrade to <b>${esc(rec)}</b> or later to clear the matched vulnerabilities. Always confirm against your vendor's advisory before deploying.</span>`;
+    } else { $('#fw-fix').style.display = 'none'; }
+  }
+
+  $('#fw-stats').innerHTML =
+    `<div class="stat crit"><div class="n">${crit}</div><div class="l">Critical</div></div>` +
+    `<div class="stat"><div class="n">${counts.HIGH}</div><div class="l">High</div></div>` +
+    `<div class="stat"><div class="n">${counts.MEDIUM}</div><div class="l">Medium</div></div>` +
+    `<div class="stat"><div class="n">${counts.LOW + counts['']}</div><div class="l">Low / NA</div></div>` +
+    `<div class="stat kev"><div class="n">${kev}</div><div class="l">Actively exploited</div></div>`;
+
+  const card = $('#fw-list-card');
+  if(n === 0){ card.style.display = 'none'; }
+  else {
+    card.style.display = 'block';
+    const rank = s => ({CRITICAL:0, HIGH:1, MEDIUM:2, LOW:3}[s] ?? 4);
+    hits.sort((a, b) => (b.rec.kev - a.rec.kev) || (rank(a.rec.sev) - rank(b.rec.sev)) || ((b.rec.cvss || 0) - (a.rec.cvss || 0)));
+    const cap = 60, shown = hits.slice(0, cap);
+    $('#fw-list-title').textContent = `CVEs affecting ${prod.product} ${version}` + (n > cap ? ` — top ${cap} of ${n}` : ` — ${n}`);
+    $('#fw-table').innerHTML =
+      '<thead><tr><th>CVE</th><th>Severity</th><th>Fixed in</th><th>Published</th><th>Summary</th></tr></thead><tbody>' +
+      shown.map(h => {
+        const r = h.rec, fx = fixOf(h.mr);
+        return `<tr><td><a href="${NVD_CVE}${r.id}" target="_blank" rel="noopener">${r.id}</a>${r.kev ? '<span class="kev-badge">KEV</span>' : ''}</td>` +
+          `<td><span class="sev-badge sev-${r.sev || ''}">${r.cvss != null ? r.cvss + ' ' : ''}${r.sev || 'N/A'}</span></td>` +
+          `<td>${fx ? esc(fx) : '—'}</td>` +
+          `<td>${esc(r.pub || '')}</td>` +
+          `<td class="desc">${esc(r.d || '')}</td></tr>`;
+      }).join('') + '</tbody>';
+  }
+
+  $('#fw-meta').textContent = `Index generated ${INDEX.generated} · source: ${INDEX.source}. Coverage is limited to the listed products and to CVEs carrying version data in the NVD; the absence of a CVE here is not a guarantee of safety.`;
+  $('#fw-results').classList.add('on');
+  $('#fw-results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function init(){
+  const mip = $('#m-ip'), mfw = $('#m-fw');
+  function setMode(fw){
+    mip.classList.toggle('on', !fw); mfw.classList.toggle('on', fw);
+    $('#mode-ip').classList.toggle('on', !fw); $('#mode-fw').classList.toggle('on', fw);
+    if(fw && !INDEX && !loading) loadIndex().then(populateProducts).catch(() => {});
+  }
+  mip.addEventListener('click', () => setMode(false));
+  mfw.addEventListener('click', () => setMode(true));
+  $('#fw-form').addEventListener('submit', e => { e.preventDefault(); check($('#fw-product').value, $('#fw-version').value); });
+  document.querySelectorAll('#mode-fw .examples button').forEach(b =>
+    b.addEventListener('click', () => {
+      const go = () => { $('#fw-product').value = b.dataset.p; $('#fw-version').value = b.dataset.v; check(b.dataset.p, b.dataset.v); };
+      if(!INDEX) loadIndex().then(d => { populateProducts(d); go(); }).catch(() => go()); else go();
+    }));
+}
+if(document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();
 </script>
 </body>
 </html>
