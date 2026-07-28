@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPSCOPE ✲ IP Threat & Geolocation Intelligence</title>
+<title>VULNSCOPE ✲ Firewall CVE & Vulnerability Analysis</title>
 <meta name="description" content="Look up any IP address — geolocation, network owner, and a transparent risk score built from threat signals (blacklist/abuser, Tor, proxy, VPN, datacenter). By Sougat Shekhar Hota.">
-<meta property="og:title" content="IPSCOPE — IP Threat & Geolocation Intelligence">
+<meta property="og:title" content="VULNSCOPE — IP Threat & Geolocation Intelligence">
 <meta property="og:description" content="Look up any IP: where it is, who owns it, and whether to trust it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -186,13 +186,24 @@
     .fwform{grid-template-columns:1fr}
     .stats{grid-template-columns:repeat(2,1fr)}
   }
+  .cve-lookup{margin-top:20px; padding-top:18px; border-top:1px solid var(--line)}
+  .in-link{font:600 10px/1 var(--sans); color:var(--info); text-decoration:none; margin-left:7px; white-space:nowrap;
+    border:1px solid rgba(44,125,160,.35); border-radius:999px; padding:2px 7px; vertical-align:middle}
+  .in-link:hover{background:var(--info); color:#fff}
+  #cve-result{padding-bottom:10px}
+  #cve-result .kv{display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-top:1px solid var(--line); font-size:14px}
+  #cve-result .kv:first-of-type{border-top:0}
+  #cve-result .kv .k{color:var(--mut)}
+  .india-note{margin-top:20px; padding:14px 17px; border:1px solid var(--line); border-radius:12px; background:var(--panel);
+    font-size:13.5px; line-height:1.6; color:var(--ink)}
+  .india-note a{color:var(--accent)}
 </style>
 </head>
 <body>
 
 <header class="site">
   <div class="wrap">
-    <a class="brand" href="#top"><span class="mark">✲</span> IPSCOPE</a>
+    <a class="brand" href="#top"><span class="mark">✲</span> VULNSCOPE</a>
     <div class="head-links">
       <a class="hide-sm" href="https://github.com/sougatshekharhota/ipscope" target="_blank" rel="noopener">GitHub</a>
       <a href="https://sougatshekharhota.github.io/portfolio/">← Portfolio</a>
@@ -202,11 +213,11 @@
 
 <main class="wrap" id="top">
   <div class="modebar">
-    <button id="m-ip" class="on">◎ IP Threat Lookup</button>
-    <button id="m-fw">🛡 Firewall Patch-Gap Scanner</button>
+    <button id="m-fw" class="on">🛡 Firewall CVE &amp; Patch Scanner</button>
+    <button id="m-ip">◎ IP Threat Lookup</button>
   </div>
 
-  <div class="mode on" id="mode-ip">
+  <div class="mode" id="mode-ip">
   <section class="hero">
     <div class="eyebrow caps">IP Threat &amp; Geolocation Intelligence</div>
     <h1>Look up any IP. See where it is — and whether to trust it.</h1>
@@ -283,11 +294,11 @@
   </section>
   </div><!-- /mode-ip -->
 
-  <div class="mode" id="mode-fw">
+  <div class="mode on" id="mode-fw">
   <section class="hero">
     <div class="eyebrow caps">Firewall Exposure &amp; Patch-Gap Scanner</div>
     <h1>Is your firewall running a version with known holes?</h1>
-    <p class="lede">Pick your firewall platform and enter the firmware version you're running. IPSCOPE checks it
+    <p class="lede">Pick your firewall platform and enter the firmware version you're running. VULNSCOPE checks it
       against every published vulnerability for that product — cross-referenced with CISA's actively-exploited
       catalog — and tells you whether to patch, and to which version.</p>
 
@@ -304,7 +315,17 @@
     </div>
     <div class="err" id="fw-err"></div>
     <div id="fw-loading"><span class="spin"></span> Loading vulnerability index…</div>
+
+    <div class="cve-lookup">
+      <div style="color:var(--mut); font-size:14px; margin-bottom:10px">Or analyze a specific CVE by its ID:</div>
+      <form class="fwform" id="cve-form" autocomplete="off" style="grid-template-columns:1fr auto">
+        <input id="cve-id" type="text" placeholder="CVE-2022-40684" aria-label="CVE ID">
+        <button class="btn" type="submit" id="cve-go">Look up CVE</button>
+      </form>
+    </div>
   </section>
+
+  <section id="cve-result" style="display:none"></section>
 
   <section id="fw-results">
     <div class="verdict" id="fw-verdict">
@@ -328,10 +349,15 @@
     </div>
 
     <div class="card" id="fw-list-card" style="margin-top:20px">
-      <span class="caps">Matching vulnerabilities</span>
-      <h3 id="fw-list-title" style="margin-bottom:6px">CVEs affecting your version</h3>
-      <div class="tablewrap"><table class="cvetable" id="fw-table"></table></div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap">
+        <div><span class="caps">Matching vulnerabilities</span>
+        <h3 id="fw-list-title" style="margin:0">CVEs affecting your version</h3></div>
+        <button class="btn ghost" id="fw-export" style="white-space:nowrap">⤓ Download Excel (CSV)</button>
+      </div>
+      <div class="tablewrap" style="margin-top:12px"><table class="cvetable" id="fw-table"></table></div>
     </div>
+
+    <div class="india-note">🇮🇳 <b>Indian ecosystem:</b> CERT-In — the Indian Computer Emergency Response Team — is India's national cyber authority and a CVE-program partner. Every vulnerability above carries a CERT-In advisory lookup, and CERT-In's directives (including mandatory incident reporting) govern organisations operating in India. <a href="https://www.cert-in.org.in/" target="_blank" rel="noopener">cert-in.org.in ↗</a></div>
 
     <details class="method">
       <summary>How the patch-gap check works</summary>
@@ -339,7 +365,7 @@
         <p>Your version is tested against the affected-version ranges of every published CVE for the selected
         product. Data comes from the <a href="https://nvd.nist.gov/developers/vulnerabilities" target="_blank" rel="noopener" style="color:var(--accent)">NVD 2.0 API</a>
         and is cross-referenced with the <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener" style="color:var(--accent)">CISA Known Exploited Vulnerabilities</a>
-        catalog to flag CVEs under active attack. A CVE counts as affecting you when your version falls inside any of
+        catalog to flag CVEs under active attack, and mapped to <a href="https://www.cert-in.org.in/" target="_blank" rel="noopener" style="color:var(--accent)">CERT-In</a> (India's national CVE authority) for local advisory lookup. A CVE counts as affecting you when your version falls inside any of
         its vulnerable ranges (e.g. ≥ 7.0.0 and &lt; 7.0.12). The recommended version clears every matched range —
         the same transparent, weighted approach behind
         <a href="https://github.com/sougatshekharhota/pulse-360" target="_blank" rel="noopener" style="color:var(--accent)">PULSE-360</a> and
@@ -540,6 +566,60 @@ document.querySelectorAll('#mode-ip .examples button').forEach(b =>
 'use strict';
 const $ = s => document.querySelector(s);
 const NVD_CVE = 'https://nvd.nist.gov/vuln/detail/';
+const certInUrl = id => 'https://www.google.com/search?q=' + encodeURIComponent('site:cert-in.org.in ' + id);
+let LAST_SCAN = null;
+function rangeStr(r){
+  if(r.eq) return '= ' + r.eq;
+  const a = []; if(r.gte) a.push('≥ ' + r.gte); if(r.gt) a.push('> ' + r.gt);
+  if(r.lte) a.push('≤ ' + r.lte); if(r.lt) a.push('< ' + r.lt);
+  return a.join(' and ') || 'all versions';
+}
+function csvCell(s){ s = String(s == null ? '' : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
+function exportScanCSV(){
+  if(!LAST_SCAN) return;
+  const {prod, version, hits} = LAST_SCAN;
+  const head = ['CVE ID','Severity','CVSS','Actively Exploited (CISA KEV)','Fixed In','Published','Summary','NVD Link','CERT-In (India) Lookup'];
+  const rows = hits.map(h => { const r = h.rec, fx = fixOf(h.mr);
+    return [r.id, r.sev||'', r.cvss!=null?r.cvss:'', r.kev?'YES':'no', fx||'', r.pub||'', r.d||'', NVD_CVE+r.id, certInUrl(r.id)].map(csvCell).join(','); });
+  const csv = ['VULNSCOPE firewall CVE scan', prod.vendor+' '+prod.product+' v'+version, hits.length+' matching CVEs', INDEX?('index generated '+INDEX.generated):'', ''].map(csvCell).join('\n')
+    + '\n' + head.map(csvCell).join(',') + '\n' + rows.join('\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'vulnscope-' + prod.key + '-' + version.replace(/[^\w.]/g,'') + '.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+function cveLookup(raw){
+  const id = (raw||'').trim().toUpperCase().replace(/\s+/g,'');
+  const box = $('#cve-result');
+  const S = 'color:var(--accent); text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:7px 13px';
+  if(!/^CVE-\d{4}-\d{3,7}$/.test(id)){
+    box.style.display='block';
+    box.innerHTML = '<div class="card"><span class="caps">CVE lookup</span><p style="color:var(--mut); font-size:14px; margin-top:8px">Enter a valid CVE ID, for example <b>CVE-2022-40684</b>.</p></div>';
+    box.scrollIntoView({behavior:'smooth', block:'start'}); return;
+  }
+  loadIndex().then(d => {
+    let found = null; const affected = [];
+    d.products.forEach(p => { const rec = (d.cves[p.key]||[]).find(r => r.id === id);
+      if(rec){ found = found || rec; affected.push(p.vendor+' '+p.product+' ('+rec.r.map(rangeStr).join('; ')+')'); } });
+    box.style.display='block';
+    if(!found){
+      box.innerHTML = '<div class="card"><span class="caps">CVE lookup</span><h3 style="margin:6px 0 8px">'+id+'</h3>'
+        + '<p style="color:var(--mut); font-size:14.5px">Not in VULNSCOPE\'s firewall CVE index (which covers seven network-security platforms). Open the authoritative records:</p>'
+        + '<div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:14px"><a href="'+NVD_CVE+id+'" target="_blank" rel="noopener" style="'+S+'">NVD record ↗</a><a href="'+certInUrl(id)+'" target="_blank" rel="noopener" style="'+S+'">🇮🇳 CERT-In (India) ↗</a></div></div>';
+    } else {
+      const r = found;
+      box.innerHTML = '<div class="card"><div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap"><span class="caps">CVE lookup</span>'
+        + '<span class="sev-badge sev-'+(r.sev||'')+'">'+(r.cvss!=null?r.cvss+' ':'')+(r.sev||'N/A')+'</span></div>'
+        + '<h3 style="margin:8px 0 4px">'+id+(r.kev?' <span class="kev-badge">KEV — actively exploited</span>':'')+'</h3>'
+        + '<p class="desc" style="margin:10px 0 16px">'+esc(r.d||'')+'</p>'
+        + '<div class="kv"><span class="k">Published</span><span>'+esc(r.pub||'—')+'</span></div>'
+        + '<div class="kv"><span class="k">CVSS / severity</span><span>'+(r.cvss!=null?r.cvss:'—')+' '+(r.sev||'')+'</span></div>'
+        + '<div class="kv"><span class="k">Actively exploited (CISA KEV)</span><span>'+(r.kev?'Yes':'No')+'</span></div>'
+        + '<div class="kv"><span class="k">Affected firewall products</span><span style="text-align:right; max-width:62%">'+esc(affected.join(' · '))+'</span></div>'
+        + '<div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px"><a href="'+NVD_CVE+id+'" target="_blank" rel="noopener" style="'+S+'">Full NVD record ↗</a><a href="'+certInUrl(id)+'" target="_blank" rel="noopener" style="'+S+'">🇮🇳 CERT-In (India) advisories ↗</a></div></div>';
+    }
+    box.scrollIntoView({behavior:'smooth', block:'start'});
+  }).catch(() => { box.style.display='block'; box.innerHTML = '<div class="card"><p style="color:var(--mut)">Could not load the vulnerability index. Try again in a moment.</p></div>'; });
+}
 let INDEX = null, loading = null;
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -608,6 +688,7 @@ function check(pkey, version){
 
 function render(prod, version, hits){
   const n = hits.length;
+  LAST_SCAN = n ? {prod, version, hits} : null;
   const kev = hits.filter(h => h.rec.kev).length;
   const counts = {CRITICAL:0, HIGH:0, MEDIUM:0, LOW:0, '':0};
   hits.forEach(h => { const s = counts.hasOwnProperty(h.rec.sev) ? h.rec.sev : ''; counts[s]++; });
@@ -657,7 +738,7 @@ function render(prod, version, hits){
       '<thead><tr><th>CVE</th><th>Severity</th><th>Fixed in</th><th>Published</th><th>Summary</th></tr></thead><tbody>' +
       shown.map(h => {
         const r = h.rec, fx = fixOf(h.mr);
-        return `<tr><td><a href="${NVD_CVE}${r.id}" target="_blank" rel="noopener">${r.id}</a>${r.kev ? '<span class="kev-badge">KEV</span>' : ''}</td>` +
+        return `<tr><td><a href="${NVD_CVE}${r.id}" target="_blank" rel="noopener">${r.id}</a>${r.kev ? '<span class="kev-badge">KEV</span>' : ''}<a class="in-link" href="${certInUrl(r.id)}" target="_blank" rel="noopener" title="Search CERT-In (India) advisories for this CVE">CERT-In ↗</a></td>` +
           `<td><span class="sev-badge sev-${r.sev || ''}">${r.cvss != null ? r.cvss + ' ' : ''}${r.sev || 'N/A'}</span></td>` +
           `<td>${fx ? esc(fx) : '—'}</td>` +
           `<td>${esc(r.pub || '')}</td>` +
@@ -685,6 +766,10 @@ function init(){
       const go = () => { $('#fw-product').value = b.dataset.p; $('#fw-version').value = b.dataset.v; check(b.dataset.p, b.dataset.v); };
       if(!INDEX) loadIndex().then(d => { populateProducts(d); go(); }).catch(() => go()); else go();
     }));
+  $('#cve-form').addEventListener('submit', e => { e.preventDefault(); cveLookup($('#cve-id').value); });
+  $('#fw-export').addEventListener('click', exportScanCSV);
+  // firewall CVE mode is the default — load the index up front
+  if($('#mode-fw').classList.contains('on') && !INDEX && !loading) loadIndex().then(populateProducts).catch(() => {});
 }
 if(document.readyState !== 'loading') init(); else document.addEventListener('DOMContentLoaded', init);
 })();
