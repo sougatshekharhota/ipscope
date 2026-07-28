@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VULNSCOPE ✲ Firewall CVE & Vulnerability Analysis</title>
-<meta name="description" content="Look up any IP address — geolocation, network owner, and a transparent risk score built from threat signals (blacklist/abuser, Tor, proxy, VPN, datacenter). By Sougat Shekhar Hota.">
+<meta name="description" content="Check whether your firewall runs a version with known, actively-exploited CVEs across Fortinet, Palo Alto, Cisco, SonicWall, Juniper and pfSense — with the exact fix version, CVE lookup, Excel export and CERT-In (India) mapping. Runs in your browser.">
 <meta property="og:title" content="VULNSCOPE — IP Threat & Geolocation Intelligence">
 <meta property="og:description" content="Look up any IP: where it is, who owns it, and whether to trust it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
   :root{
-    /* McKinsey-inspired palette (matches the portfolio) */
+    /* McKinsey-inspired palette */
     --bg:#F6F8FA; --ink:#051C2C; --mut:rgba(5,28,44,.58);
     --line:rgba(5,28,44,.14); --card:#FFFFFF; --panel:#E6EBF1; --accent:#2251FF;
     --good:#0f7a3d; --good-bg:rgba(15,122,61,.10);
@@ -206,7 +206,6 @@
     <a class="brand" href="#top"><span class="mark">✲</span> VULNSCOPE</a>
     <div class="head-links">
       <a class="hide-sm" href="https://github.com/sougatshekharhota/ipscope" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://sougatshekharhota.github.io/portfolio/">← Portfolio</a>
     </div>
   </div>
 </header>
@@ -283,9 +282,7 @@
     <details class="method">
       <summary>How the risk score is computed</summary>
       <div class="m-body">
-        <p>The score is a transparent, weighted sum of the threat signals returned for the IP — the same
-        weighted-signal method behind my other projects (<a href="https://github.com/sougatshekharhota/pulse-360" target="_blank" rel="noopener" style="color:var(--accent)">PULSE-360</a>,
-        <a href="https://github.com/sougatshekharhota/optichain" target="_blank" rel="noopener" style="color:var(--accent)">OPTICHAIN</a>).
+        <p>The score is a transparent, weighted sum of the threat signals returned for the IP.
         Each flag that is present adds its weight; the total is capped at 100.</p>
         <table id="method-table"></table>
         <p style="margin-top:12px"><b>Bands:</b> 0 = Clean · 1–24 = Low · 25–54 = Elevated · 55+ = High risk.</p>
@@ -366,10 +363,7 @@
         product. Data comes from the <a href="https://nvd.nist.gov/developers/vulnerabilities" target="_blank" rel="noopener" style="color:var(--accent)">NVD 2.0 API</a>
         and is cross-referenced with the <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener" style="color:var(--accent)">CISA Known Exploited Vulnerabilities</a>
         catalog to flag CVEs under active attack, and mapped to <a href="https://www.cert-in.org.in/" target="_blank" rel="noopener" style="color:var(--accent)">CERT-In</a> (India's national CVE authority) for local advisory lookup. A CVE counts as affecting you when your version falls inside any of
-        its vulnerable ranges (e.g. ≥ 7.0.0 and &lt; 7.0.12). The recommended version clears every matched range —
-        the same transparent, weighted approach behind
-        <a href="https://github.com/sougatshekharhota/pulse-360" target="_blank" rel="noopener" style="color:var(--accent)">PULSE-360</a> and
-        <a href="https://github.com/sougatshekharhota/optichain" target="_blank" rel="noopener" style="color:var(--accent)">OPTICHAIN</a>.</p>
+        its vulnerable ranges (e.g. ≥ 7.0.0 and &lt; 7.0.12). The recommended version clears every matched range.</p>
         <p id="fw-meta" style="margin-top:10px"></p>
       </div>
     </details>
@@ -383,7 +377,7 @@
       Map: <a href="https://carto.com/" target="_blank" rel="noopener">CARTO</a> /
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></span>
     <span class="disc">Signals are indicative, drawn from free public threat feeds — useful for triage, not a
-      definitive verdict. Built by <a href="https://sougatshekharhota.github.io/portfolio/">Sougat Shekhar Hota</a>.</span>
+      definitive verdict.</span>
   </div>
 </footer>
 
