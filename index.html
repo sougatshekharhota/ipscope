@@ -74,9 +74,9 @@
   .err.on{display:block}
 
   /* loading */
-  #loading{display:none; align-items:center; gap:12px; margin:26px 0; color:var(--mut); font-style:italic;
+  #loading, #fw-loading{display:none; align-items:center; gap:12px; margin:26px 0; color:var(--mut); font-style:italic;
     font-family:var(--serif); font-size:17px}
-  #loading.on{display:flex}
+  #loading.on, #fw-loading.on{display:flex}
   .spin{width:16px; height:16px; border:2px solid var(--line); border-top-color:var(--accent); border-radius:50%;
     animation:sp .8s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
